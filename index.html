@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Reservation System - Flowchart</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .flowchart-wrapper {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            color: #333;
+        }
+        
+        .info-box h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .legend-item.entry {
+            background-color: #e1f5ff;
+            color: #333;
+        }
+        
+        .legend-item.home {
+            background-color: #c8e6c9;
+            color: #333;
+        }
+        
+        .legend-item.auth {
+            background-color: #fff9c4;
+            color: #333;
+        }
+        
+        .legend-item.reserve {
+            background-color: #ffe0b2;
+            color: #333;
+        }
+        
+        .legend-item.manage {
+            background-color: #f8bbd0;
+            color: #333;
+        }
+        
+        .legend-item.logout {
+            background-color: #d1c4e9;
+            color: #333;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.3s;
+            text-align: center;
+        }
+        
+        .download-btn:hover {
+            background: #764ba2;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Event Reservation System</h1>
+            <p>Complete Application Flow Diagram</p>
+        </div>
+        
+        <div class="flowchart-wrapper">
+            <div class="mermaid">
+graph TD
+    A[User Visits Application] --> B{User Logged In?}
+    B -->|No| C[Redirect to Login Page]
+    B -->|Yes| D[Home Page - Index.php]
+    
+    C --> E{New User?}
+    E -->|No| F[Login Page<br/>Enter Username & Password]
+    E -->|Yes| G[Register Page<br/>Create New Account]
+    
+    F --> F1{Valid Credentials?}
+    F1 -->|No| F2[Show Error Message]
+    F2 --> F
+    F1 -->|Yes| H[Set Session & Redirect to Home]
+    
+    G --> G1{Valid Input?}
+    G1 -->|No| G2[Show Error Message]
+    G2 --> G
+    G1 -->|Yes| G3[Create User in Database]
+    G3 --> H
+    
+    H --> D
+    
+    D --> I{User Choice}
+    I -->|Make Reservation| J[Reserve Page<br/>reserve.php]
+    I -->|View Reservations| K[List Reservations<br/>list.php]
+    I -->|Logout| L[Logout & Clear Session]
+    
+    J --> J1[Fill Reservation Form]
+    J1 --> J2{Valid Data?}
+    J2 -->|No| J3[Show Error]
+    J3 --> J1
+    J2 -->|Yes| J4[Save to Database]
+    J4 --> K
+    
+    K --> K1[Display All Reservations]
+    K1 --> K2{User Action}
+    K2 -->|Edit| M[Update Page<br/>update.php]
+    K2 -->|Delete| N[Delete.php<br/>Remove Reservation]
+    K2 -->|Back| D
+    
+    M --> M1[Modify Reservation Details]
+    M1 --> M2{Save Changes?}
+    M2 -->|Yes| M3[Update Database]
+    M3 --> K
+    M2 -->|No| D
+    
+    N --> N1{Confirm Delete?}
+    N1 -->|Yes| N2[Delete from Database]
+    N2 --> K
+    N1 -->|No| K
+    
+    L --> A
+    
+    style A fill:#e1f5ff
+    style D fill:#c8e6c9
+    style F fill:#fff9c4
+    style G fill:#fff9c4
+    style J fill:#ffe0b2
+    style K fill:#ffe0b2
+    style M fill:#f8bbd0
+    style N fill:#f8bbd0
+    style L fill:#d1c4e9
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h3>📋 Legend & Color Coding</h3>
+            <div class="legend">
+                <div class="legend-item entry">🔵 Entry Point</div>
+                <div class="legend-item home">🟢 Home Page</div>
+                <div class="legend-item auth">🟡 Authentication</div>
+                <div class="legend-item reserve">🟠 Reservation</div>
+                <div class="legend-item manage">🔴 Update/Delete</div>
+                <div class="legend-item logout">🟣 Logout</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <p style="margin-top: 20px; color: #666;">
+                💡 This flowchart shows the complete user journey through the Event Reservation System
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.contentLoaded();
+        });
+    </script>
+</body>
+</html>
