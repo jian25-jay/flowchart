@@ -50,24 +50,43 @@
             font-size: 1.1em;
         }
         
-        .flowchart-wrapper {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            overflow-x: auto;
+        .zoom-controls {
             display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
-        .mermaid {
-            display: flex;
-            justify-content: center;
-            margin: 0 auto;
+        .zoom-btn {
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 1em;
         }
         
-        .mermaid svg {
-            max-width: 100%;
-            height: auto;
+        .zoom-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .zoom-level {
+            padding: 10px 16px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #333;
+            min-width: 80px;
+            text-align: center;
         }
         
         .info-box {
@@ -146,6 +165,92 @@
             background: #764ba2;
         }
         
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .zoom-btn {
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+        
+        .zoom-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .zoom-level {
+            padding: 10px 16px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #333;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .flowchart-container {
+            position: relative;
+            overflow: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .flowchart-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .flowchart-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .flowchart-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        .flowchart-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        .flowchart-zoom-wrapper {
+            display: inline-flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-width: 100%;
+            min-height: 100%;
+            padding: 20px;
+            transform-origin: top center;
+            transition: transform 0.1s;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -153,6 +258,15 @@
             
             .container {
                 padding: 20px;
+            }
+            
+            .zoom-controls {
+                flex-direction: column;
+            }
+            
+            .zoom-btn,
+            .zoom-level {
+                width: 100%;
             }
         }
     </style>
@@ -164,8 +278,16 @@
             <p>Complete Application Flow Diagram</p>
         </div>
         
-        <div class="flowchart-wrapper">
-            <div class="mermaid">
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomIn">🔍 + Zoom In</button>
+            <button class="zoom-btn" id="zoomOut">🔍 - Zoom Out</button>
+            <button class="zoom-btn" id="resetZoom">↺ Reset</button>
+            <div class="zoom-level" id="zoomLevel">100%</div>
+        </div>
+        
+        <div class="flowchart-container" id="flowchartContainer">
+            <div class="flowchart-zoom-wrapper" id="zoomWrapper">
+                <div class="mermaid">
 graph TD
     A[User Visits Application] --> B{User Logged In?}
     B -->|No| C[Redirect to Login Page]
@@ -230,6 +352,7 @@ graph TD
     style L fill:#d1c4e9
             </div>
         </div>
+        </div>
         
         <div class="info-box">
             <h3>📋 Legend & Color Coding</h3>
@@ -258,6 +381,87 @@ graph TD
         });
         document.addEventListener('DOMContentLoaded', function() {
             mermaid.contentLoaded();
+        });
+        
+        // Zoom functionality
+        let currentZoom = 1;
+        const minZoom = 0.5;
+        const maxZoom = 3;
+        const zoomStep = 0.1;
+        
+        const zoomWrapper = document.getElementById('zoomWrapper');
+        const flowchartContainer = document.getElementById('flowchartContainer');
+        const zoomLevel = document.getElementById('zoomLevel');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const resetZoomBtn = document.getElementById('resetZoom');
+        
+        // Update zoom display
+        function updateZoomDisplay() {
+            zoomLevel.textContent = Math.round(currentZoom * 100) + '%';
+        }
+        
+        // Apply zoom
+        function applyZoom() {
+            zoomWrapper.style.transform = `scale(${currentZoom})`;
+            updateZoomDisplay();
+        }
+        
+        // Zoom in
+        function zoomInFunc() {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                applyZoom();
+            }
+        }
+        
+        // Zoom out
+        function zoomOutFunc() {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                applyZoom();
+            }
+        }
+        
+        // Reset zoom
+        function resetZoomFunc() {
+            currentZoom = 1;
+            flowchartContainer.scrollLeft = 0;
+            flowchartContainer.scrollTop = 0;
+            applyZoom();
+        }
+        
+        // Button event listeners
+        zoomInBtn.addEventListener('click', zoomInFunc);
+        zoomOutBtn.addEventListener('click', zoomOutFunc);
+        resetZoomBtn.addEventListener('click', resetZoomFunc);
+        
+        // Mouse wheel zoom (Ctrl + Scroll)
+        flowchartContainer.addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomInFunc();
+                } else {
+                    zoomOutFunc();
+                }
+            }
+        }, { passive: false });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '+' || e.key === '=') {
+                    e.preventDefault();
+                    zoomInFunc();
+                } else if (e.key === '-') {
+                    e.preventDefault();
+                    zoomOutFunc();
+                } else if (e.key === '0') {
+                    e.preventDefault();
+                    resetZoomFunc();
+                }
+            }
         });
     </script>
 </body>
